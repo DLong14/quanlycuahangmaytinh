@@ -1,13 +1,20 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
-package service;
+package com.shopcomputer.service;
 
-/**
- *
- * @author dduc2
- */
+import com.shopcomputer.dao.DonHangDAO;
+import com.shopcomputer.model.DonHang;
+
+import java.util.List;
+
 public class DonHangService {
-    
+    private DonHangDAO dao = new DonHangDAO();
+
+    public List<DonHang> getAllDonHang() throws Exception {
+        return dao.findAll();
+    }
+
+    public void addDonHang(DonHang dh) throws Exception {
+        dao.insertDonHang(dh);
+    }
+
+    // Bạn có thể thêm update, delete nếu cần
 }

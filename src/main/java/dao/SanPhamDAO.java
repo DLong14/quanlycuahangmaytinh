@@ -43,7 +43,7 @@ public class SanPhamDAO {
 
     // Thêm sản phẩm mới
     public void insert(SanPham sp) throws Exception {
-        String sql = "INSERT INTO san_pham(ma_sp, ten_sp, loai_sp, gia, so_luong_ton, mo_ta) VALUES (?, ?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO san_pham(ma_sp, ten_sp, loai_sp, gia, so_luong, mo_ta) VALUES (?, ?, ?, ?, ?, ?)";
         try (Connection conn = DBConnection.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
 
@@ -51,7 +51,7 @@ public class SanPhamDAO {
             ps.setString(2, sp.getTenSp());
             ps.setString(3, sp.getLoaiSp());
             ps.setBigDecimal(4, sp.getGia());
-            ps.setInt(5, sp.getSoLuongTon());
+            ps.setInt(5, sp.getSoLuong());
             ps.setString(6, sp.getMoTa());
 
             ps.executeUpdate();
@@ -60,14 +60,14 @@ public class SanPhamDAO {
 
     // Cập nhật sản phẩm
     public void update(SanPham sp) throws Exception {
-        String sql = "UPDATE san_pham SET ten_sp = ?, loai_sp = ?, gia = ?, so_luong_ton = ?, mo_ta = ? WHERE ma_sp = ?";
+        String sql = "UPDATE san_pham SET ten_sp = ?, loai_sp = ?, gia = ?, so_luong = ?, mo_ta = ? WHERE ma_sp = ?";
         try (Connection conn = DBConnection.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
 
             ps.setString(1, sp.getTenSp());
             ps.setString(2, sp.getLoaiSp());
             ps.setBigDecimal(3, sp.getGia());
-            ps.setInt(4, sp.getSoLuongTon());
+            ps.setInt(4, sp.getSoLuong());
             ps.setString(5, sp.getMoTa());
             ps.setString(6, sp.getMaSp());
 
@@ -94,7 +94,7 @@ public class SanPhamDAO {
         sp.setTenSp(rs.getString("ten_sp"));
         sp.setLoaiSp(rs.getString("loai_sp"));
         sp.setGia(rs.getBigDecimal("gia"));
-        sp.setSoLuongTon(rs.getInt("so_luong_ton"));
+        sp.setSoLuong(rs.getInt("so_luong"));
         sp.setMoTa(rs.getString("mo_ta"));
         return sp;
     }

@@ -12,7 +12,7 @@ public class SanPhamPanel extends JPanel {
     private JTable table;
     private DefaultTableModel model;
 
-    private JTextField txtMaSp, txtTenSp, txtLoaiSp, txtGia, txtSoLuongTon, txtMoTa;
+    private JTextField txtMaSp, txtTenSp, txtLoaiSp, txtGia, txtSoLuong, txtMoTa;
     private JButton btnThem, btnSua, btnXoa, btnTaiDuLieu;
 
     public SanPhamPanel() {
@@ -20,7 +20,7 @@ public class SanPhamPanel extends JPanel {
         setLayout(new BorderLayout());
 
         // Bảng dữ liệu
-        model = new DefaultTableModel(new Object[]{"Mã SP", "Tên SP", "Loại SP", "Giá", "Số lượng tồn", "Mô tả"}, 0);
+        model = new DefaultTableModel(new Object[]{"Mã SP", "Tên SP", "Loại SP", "Giá", "Số lượng ", "Mô tả"}, 0);
         table = new JTable(model);
         add(new JScrollPane(table), BorderLayout.CENTER);
 
@@ -42,9 +42,9 @@ public class SanPhamPanel extends JPanel {
         txtGia = new JTextField();
         formPanel.add(txtGia);
 
-        formPanel.add(new JLabel("Số lượng tồn"));
-        txtSoLuongTon = new JTextField();
-        formPanel.add(txtSoLuongTon);
+        formPanel.add(new JLabel("Số lượng "));
+        txtSoLuong = new JTextField();
+        formPanel.add(txtSoLuong);
 
         formPanel.add(new JLabel("Mô tả"));
         txtMoTa = new JTextField();
@@ -80,7 +80,7 @@ public class SanPhamPanel extends JPanel {
         sp.setTenSp(txtTenSp.getText());
         sp.setLoaiSp(txtLoaiSp.getText());
         sp.setGia(new BigDecimal(txtGia.getText()));
-        sp.setSoLuongTon(Integer.parseInt(txtSoLuongTon.getText()));
+        sp.setSoLuong(Integer.parseInt(txtSoLuong.getText()));
         sp.setMoTa(txtMoTa.getText());
         return sp;
     }
@@ -94,7 +94,7 @@ public class SanPhamPanel extends JPanel {
                     sp.getTenSp(),
                     sp.getLoaiSp(),
                     sp.getGia(),
-                    sp.getSoLuongTon(),
+                    sp.getSoLuong(),
                     sp.getMoTa()
             });
         }
@@ -106,7 +106,7 @@ public class SanPhamPanel extends JPanel {
         txtTenSp.setText("");
         txtLoaiSp.setText("");
         txtGia.setText("");
-        txtSoLuongTon.setText("");
+        txtSoLuong.setText("");
         txtMoTa.setText("");
         txtMaSp.setEnabled(true);
     }
@@ -127,7 +127,7 @@ public class SanPhamPanel extends JPanel {
         txtTenSp.setText(sp.getTenSp());
         txtLoaiSp.setText(sp.getLoaiSp());
         txtGia.setText(sp.getGia().toString());
-        txtSoLuongTon.setText(String.valueOf(sp.getSoLuongTon()));
+        txtSoLuong.setText(String.valueOf(sp.getSoLuong()));
         txtMoTa.setText(sp.getMoTa());
         txtMaSp.setEnabled(false);  // Khóa mã SP khi sửa
     }

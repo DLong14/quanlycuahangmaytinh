@@ -1,6 +1,5 @@
 package com.shopcomputer.ui;
 
-import com.shopcomputer.dao.DonHangDAO;
 import com.shopcomputer.dao.KhachHangDAO;
 import com.shopcomputer.dao.NhanVienDAO;
 import com.shopcomputer.dao.SanPhamDAO;
@@ -9,12 +8,12 @@ import com.shopcomputer.model.DonHang;
 import com.shopcomputer.model.KhachHang;
 import com.shopcomputer.model.NhanVien;
 import com.shopcomputer.model.SanPham;
+import com.shopcomputer.service.DonHangService;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.math.BigDecimal;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -32,43 +31,49 @@ public class TaoDonHangPanel extends JPanel {
 
     private List<ChiTietDonHang> dsChiTiet = new ArrayList<>();
 
+    private DonHangService donHangService = new DonHangService();
+
     public TaoDonHangPanel() {
         setLayout(new BorderLayout());
 
-        JPanel pnlTop = new JPanel(new GridLayout(3, 2, 10, 10));
+        // Phần trên: chọn khách hàng, nhân viên, sản phẩm, số lượng, thêm sản phẩm
+        JPanel pnlTop = new JPanel(new GridLayout(4, 2, 10, 10));
         pnlTop.setBorder(BorderFactory.createTitledBorder("Thông tin đơn hàng"));
 
         cboKhachHang = new JComboBox<>();
         cboNhanVien = new JComboBox<>();
         cboSanPham = new JComboBox<>();
         txtSoLuong = new JTextField("1");
+        btnThemSanPham = new JButton("Thêm sản phẩm");
 
         pnlTop.add(new JLabel("Khách hàng:"));
         pnlTop.add(cboKhachHang);
         pnlTop.add(new JLabel("Nhân viên:"));
         pnlTop.add(cboNhanVien);
         pnlTop.add(new JLabel("Sản phẩm:"));
-        JPanel pnlSanPham = new JPanel(new BorderLayout());
-        pnlSanPham.add(cboSanPham, BorderLayout.CENTER);
-
-        btnThemSanPham = new JButton("Thêm");
-        pnlSanPham.add(btnThemSanPham, BorderLayout.EAST);
-
-        pnlTop.add(pnlSanPham);
+        pnlTop.add(cboSanPham);
+        pnlTop.add(new JLabel("Số lượng:"));
+        pnlTop.add(txtSoLuong);
 
         add(pnlTop, BorderLayout.NORTH);
 
+        // Nút thêm sản phẩm bên dưới
+        JPanel pnlButtonThem = new JPanel();
+        pnlButtonThem.add(btnThemSanPham);
+        add(pnlButtonThem, BorderLayout.CENTER);
+
+        // Bảng chi tiết đơn hàng
         modelChiTiet = new DefaultTableModel(new Object[]{"Mã SP", "Tên SP", "Số lượng", "Đơn giá", "Thành tiền"}, 0);
         tableChiTiet = new JTable(modelChiTiet);
-        add(new JScrollPane(tableChiTiet), BorderLayout.CENTER);
+        add(new JScrollPane(tableChiTiet), BorderLayout.SOUTH);
 
+        // Tổng tiền và nút lưu đơn hàng
         JPanel pnlBottom = new JPanel(new BorderLayout());
         lblTongTien = new JLabel("Tổng tiền: 0");
         btnLuuDonHang = new JButton("Lưu đơn hàng");
         pnlBottom.add(lblTongTien, BorderLayout.WEST);
         pnlBottom.add(btnLuuDonHang, BorderLayout.EAST);
-
-        add(pnlBottom, BorderLayout.SOUTH);
+        add(pnlBottom, BorderLayout.PAGE_END);
 
         loadData();
 
@@ -78,6 +83,7 @@ public class TaoDonHangPanel extends JPanel {
 
     private void loadData() {
         try {
+            // Load khách hàng
             KhachHangDAO khDao = new KhachHangDAO();
             List<KhachHang> listKh = khDao.findAll();
             cboKhachHang.removeAllItems();
@@ -85,6 +91,7 @@ public class TaoDonHangPanel extends JPanel {
                 cboKhachHang.addItem(kh);
             }
 
+            // Load nhân viên
             NhanVienDAO nvDao = new NhanVienDAO();
             List<NhanVien> listNv = nvDao.findAll();
             cboNhanVien.removeAllItems();
@@ -92,16 +99,15 @@ public class TaoDonHangPanel extends JPanel {
                 cboNhanVien.addItem(nv);
             }
 
+            // Load sản phẩm
             SanPhamDAO spDao = new SanPhamDAO();
             List<SanPham> listSp = spDao.findAll();
             cboSanPham.removeAllItems();
             for (SanPham sp : listSp) {
                 cboSanPham.addItem(sp);
             }
-
         } catch (Exception ex) {
-            ex.printStackTrace();
-            JOptionPane.showMessageDialog(this, "Lỗi tải dữ liệu: " + ex.getMessage(), "Lỗi", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(this, "Lỗi tải dữ liệu: " + ex.getMessage());
         }
     }
 
@@ -120,17 +126,18 @@ public class TaoDonHangPanel extends JPanel {
             return;
         }
 
-        if (soLuong > sp.getSoLuongTon()) {
+        // Kiểm tra tồn kho
+        if (soLuong > sp.getSoLuong()) {
             JOptionPane.showMessageDialog(this, "Số lượng vượt quá tồn kho.");
             return;
         }
 
-        // Kiểm tra đã thêm sản phẩm chưa, nếu rồi cộng dồn số lượng
+        // Kiểm tra sản phẩm đã thêm chưa, nếu rồi cộng dồn số lượng
         boolean found = false;
         for (ChiTietDonHang ct : dsChiTiet) {
             if (ct.getMaSp().equals(sp.getMaSp())) {
                 int newQty = ct.getSoLuong() + soLuong;
-                if (newQty > sp.getSoLuongTon()) {
+                if (newQty > sp.getSoLuong()) {
                     JOptionPane.showMessageDialog(this, "Tổng số lượng vượt quá tồn kho.");
                     return;
                 }
@@ -193,7 +200,7 @@ public class TaoDonHangPanel extends JPanel {
         }
 
         DonHang dh = new DonHang();
-        dh.setMaDh("DH" + System.currentTimeMillis()); // mã đơn hàng ngẫu nhiên
+        dh.setMaDh("DH" + System.currentTimeMillis());
         dh.setMaKh(((KhachHang) cboKhachHang.getSelectedItem()).getMaKh());
         dh.setMaNv(((NhanVien) cboNhanVien.getSelectedItem()).getMaNv());
         dh.setNgayTao(new Date());
@@ -207,14 +214,13 @@ public class TaoDonHangPanel extends JPanel {
         dh.setChiTietDonHangs(dsChiTiet);
 
         try {
-            DonHangDAO dao = new DonHangDAO();
-            dao.insertDonHang(dh);
+            donHangService.addDonHang(dh);
             JOptionPane.showMessageDialog(this, "Lưu đơn hàng thành công.");
             dsChiTiet.clear();
             refreshTable();
         } catch (Exception e) {
+            JOptionPane.showMessageDialog(this, "Lỗi lưu đơn hàng: " + e.getMessage());
             e.printStackTrace();
-            JOptionPane.showMessageDialog(this, "Lỗi lưu đơn hàng: " + e.getMessage(), "Lỗi", JOptionPane.ERROR_MESSAGE);
         }
     }
 }

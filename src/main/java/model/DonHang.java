@@ -8,13 +8,15 @@ public class DonHang {
     private int id;
     private String maDh;
     private String maKh;
+    private String tenKh;   // Tên khách hàng
     private String maNv;
+    private String tenNv;   // Tên nhân viên
     private Date ngayTao;
     private BigDecimal tongTien;
-
     private List<ChiTietDonHang> chiTietDonHangs;
 
     // Getters và setters
+
     public int getId() { return id; }
     public void setId(int id) { this.id = id; }
 
@@ -24,8 +26,14 @@ public class DonHang {
     public String getMaKh() { return maKh; }
     public void setMaKh(String maKh) { this.maKh = maKh; }
 
+    public String getTenKh() { return tenKh; }
+    public void setTenKh(String tenKh) { this.tenKh = tenKh; }
+
     public String getMaNv() { return maNv; }
     public void setMaNv(String maNv) { this.maNv = maNv; }
+
+    public String getTenNv() { return tenNv; }
+    public void setTenNv(String tenNv) { this.tenNv = tenNv; }
 
     public Date getNgayTao() { return ngayTao; }
     public void setNgayTao(Date ngayTao) { this.ngayTao = ngayTao; }

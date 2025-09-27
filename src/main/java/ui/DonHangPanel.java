@@ -1,7 +1,6 @@
 package com.shopcomputer.ui;
 
 import com.shopcomputer.dao.DonHangDAO;
-import com.shopcomputer.model.ChiTietDonHang;
 import com.shopcomputer.model.DonHang;
 
 import javax.swing.*;
@@ -15,10 +14,13 @@ public class DonHangPanel extends JPanel {
     private DefaultTableModel model;
     private JButton btnTaiDuLieu;
 
+    private SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
+
     public DonHangPanel() {
         setLayout(new BorderLayout());
 
-        model = new DefaultTableModel(new Object[]{"Mã ĐH", "Mã KH", "Mã NV", "Ngày tạo", "Tổng tiền"}, 0);
+        // Tạo model với các cột: Mã đơn, Mã khách, Mã NV, Ngày tạo, Tổng tiền
+        model = new DefaultTableModel(new Object[]{"Mã đơn", "Mã khách", "Mã nhân viên", "Ngày tạo", "Tổng tiền"}, 0);
         table = new JTable(model);
 
         btnTaiDuLieu = new JButton("Tải dữ liệu");
@@ -34,15 +36,13 @@ public class DonHangPanel extends JPanel {
             DonHangDAO dao = new DonHangDAO();
             List<DonHang> list = dao.findAll();
 
-            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-            model.setRowCount(0);
-
+            model.setRowCount(0); // Xóa dữ liệu cũ
             for (DonHang dh : list) {
                 model.addRow(new Object[]{
                         dh.getMaDh(),
                         dh.getMaKh(),
                         dh.getMaNv(),
-                        sdf.format(dh.getNgayTao()),
+                        dh.getNgayTao() != null ? sdf.format(dh.getNgayTao()) : "",
                         dh.getTongTien()
                 });
             }

@@ -8,7 +8,6 @@ public class KhachHang {
     private String diaChi;
     private String email;
 
-    // Getters và setters
     public int getId() {
         return id;
     }

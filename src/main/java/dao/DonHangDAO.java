@@ -10,30 +10,37 @@ import java.util.List;
 
 public class DonHangDAO {
 
-    public List<DonHang> findAll() throws Exception {
-        List<DonHang> list = new ArrayList<>();
-        String sql = "SELECT * FROM don_hang";
-        try (Connection conn = DBConnection.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql);
-             ResultSet rs = ps.executeQuery()) {
+   public List<DonHang> findAll() throws Exception {
+    List<DonHang> list = new ArrayList<>();
+    String sql = "SELECT dh.*, kh.ho_ten as ten_kh, nv.ho_ten as ten_nv " +
+                 "FROM don_hang dh " +
+                 "LEFT JOIN khach_hang kh ON dh.ma_kh = kh.ma_kh " +
+                 "LEFT JOIN nhan_vien nv ON dh.ma_nv = nv.ma_nv";
 
-            while (rs.next()) {
-                DonHang dh = new DonHang();
-                dh.setId(rs.getInt("id"));
-                dh.setMaDh(rs.getString("ma_dh"));
-                dh.setMaKh(rs.getString("ma_kh"));
-                dh.setMaNv(rs.getString("ma_nv"));
-                dh.setNgayTao(rs.getDate("ngay_tao"));
-                dh.setTongTien(rs.getBigDecimal("tong_tien"));
+    try (Connection conn = DBConnection.getConnection();
+         PreparedStatement ps = conn.prepareStatement(sql);
+         ResultSet rs = ps.executeQuery()) {
 
-                // Lấy chi tiết đơn hàng
-                dh.setChiTietDonHangs(findChiTietByMaDh(dh.getMaDh()));
+        while (rs.next()) {
+            DonHang dh = new DonHang();
+            dh.setId(rs.getInt("id"));
+            dh.setMaDh(rs.getString("ma_dh"));
+            dh.setMaKh(rs.getString("ma_kh"));
+            dh.setTenKh(rs.getString("ten_kh"));   // Tên khách hàng lấy từ join
+            dh.setMaNv(rs.getString("ma_nv"));
+            dh.setTenNv(rs.getString("ten_nv"));   // Tên nhân viên lấy từ join
+            dh.setNgayTao(rs.getDate("ngay_tao"));
+            dh.setTongTien(rs.getBigDecimal("tong_tien"));
 
-                list.add(dh);
-            }
+            // Lấy chi tiết đơn hàng
+            dh.setChiTietDonHangs(findChiTietByMaDh(dh.getMaDh()));
+
+            list.add(dh);
         }
-        return list;
     }
+    return list;
+}
+
 
     public List<ChiTietDonHang> findChiTietByMaDh(String maDh) throws Exception {
         List<ChiTietDonHang> list = new ArrayList<>();
